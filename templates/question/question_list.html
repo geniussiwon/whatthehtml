@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block content %}
+<title>kr_coder 질문목록</title>
+
+<div class="container my-5">
+    <h1 class="border-bottom text-center border-top border-dark py-2 mx-5">질문리스트</h1>
+
+{% if question_list.items %}
+{% for question_block in question_blocks %}
+<div class = "row mx-5">
+    <div class = "col-1 mt-4">
+        <div class="bg-light text-center p-3 border font-weight-bolder mb-1">{{ question_block.star }}</div>
+        <a href="{{ url_for('question.voter', question_id=question_block.id_) }}"class="recommend btn btn-sm btn-secondary btn-block my-1">추천</a>
+    </div>
+    <div class = "col-11">
+        <div class="card border-dark mt-4" style="max-width: 800px;">
+            <div class="card-header">
+                <h4 class = "mx-3 mt-3">{{ question_block.subject }}</h4>
+                <div class = "mx-3 mt-2 card-text">{{ question_block.user }} ㅡ {{ question_block.date|datetime }}</div>
+                {% if question_block.is_modify %}
+                    <div class = "card-text text-success mx-3"> id = {{ question_block.id_ }} (수정됨)</div>
+                {% else %}
+                    <div class = "card-text text-success mx-3"> id = {{ question_block.id_ }} </div>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class = "card border-primary" style="max-height: 250px; overflow: auto;">
+                    <div class = "my-2 mx-3">
+                    {% for block in question_block.content %}
+                        {% if loop.index%2 == 1 %}
+                            <div class="card-text text-truncate" style="white-space: pre-wrap; ">{{ block }}</div>
+                        {% else %}
+                            <div><code class="text-truncate" style="white-space: pre-wrap;">{{ block }}</code></div>
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="d-flex flex-row-reverse mx-5">
+    <div class = mx-5>
+        <div class = mx-5>
+            <div class = mx-3>
+                <a class="btn btn-primary btn-sm mb-3 mt-1" href = "{{ url_for('question.detail', question_id = question_block.id_) }}">답변보러가기</a>
+            </div>     
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+    <a href="{{ url_for('question.create') }}" class="btn btn-outline-info my-3 mx-5 btn-lr">질문 등록하기</a>
+    <!-- 페이징처리 시작 -->
+    <ul class="pagination justify-content-center">
+        <!-- 이전페이지 -->
+        {% for page_num in question_list.iter_pages() %}
+            {% if page_num %}
+                {% if page_num != question_list.page %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                </li>
+                {% else %}
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link" href="#">{{ page_num }}</a>
+                </li>
+                {% endif %}
+            {% else %}
+                <li class="disabled">
+                    <a class="page-link" href="#">...</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    <!-- 페이징처리 끝 -->
+</div>
+{% endblock %}
